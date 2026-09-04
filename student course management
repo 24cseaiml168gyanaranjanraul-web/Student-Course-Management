@@ -1,0 +1,294 @@
+ React, { createContext, useContext } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useParams,
+} from "react-router-dom";
+
+// ====================
+// Context API
+// ====================
+
+const StudentContext = createContext();
+
+function StudentProvider({ children }) {
+  const student = {
+    name: "Rahul Sharma",
+    email: "rahul@example.com",
+    course: "Computer Science",
+  };
+
+  return (
+    <StudentContext.Provider value={student}>
+      {children}
+    </StudentContext.Provider>
+  );
+}
+
+function useStudent() {
+  return useContext(StudentContext);
+}
+
+// ====================
+// Navbar
+// ====================
+
+function Navbar() {
+  return (
+    <nav style={styles.navbar}>
+      <h2>Student Course Management</h2>
+
+      <div>
+        <Link to="/" style={styles.link}>
+          Home
+        </Link>
+
+        <Link to="/courses" style={styles.link}>
+          Courses
+        </Link>
+
+        <Link to="/about" style={styles.link}>
+          About
+        </Link>
+      </div>
+    </nav>
+  );
+}
+
+// ====================
+// Home Page
+// ====================
+
+function Home() {
+  const student = useStudent();
+
+  return (
+    <div style={styles.container}>
+      <h1>Welcome to Student Course Management</h1>
+
+      <div style={styles.card}>
+        <h2>Student Information</h2>
+
+        <p>
+          <strong>Name:</strong> {student.name}
+        </p>
+
+        <p>
+          <strong>Email:</strong> {student.email}
+        </p>
+
+        <p>
+          <strong>Course:</strong> {student.course}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ====================
+// Courses Page
+// ====================
+
+function Courses() {
+  const courses = [
+    {
+      id: 1,
+      name: "React Development",
+      description:
+        "Learn React and build modern web applications.",
+    },
+    {
+      id: 2,
+      name: "JavaScript Programming",
+      description:
+        "Learn the fundamentals of JavaScript programming.",
+    },
+  ];
+
+  return (
+    <div style={styles.container}>
+      <h1>Available Courses</h1>
+
+      <div style={styles.courseContainer}>
+        {courses.map((course) => (
+          <div style={styles.card} key={course.id}>
+            <h2>{course.name}</h2>
+
+            <p>{course.description}</p>
+
+            <Link
+              to={`/course/${course.id}`}
+              style={styles.button}
+            >
+              View Course
+            </Link>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ====================
+// Dynamic Course Page
+// ====================
+
+function CourseDetails() {
+  const { id } = useParams();
+
+  const courses = {
+    1: {
+      name: "React Development",
+      description:
+        "Learn React, components, props, state, hooks, and routing.",
+    },
+
+    2: {
+      name: "JavaScript Programming",
+      description:
+        "Learn variables, functions, arrays, objects, and modern JavaScript.",
+    },
+  };
+
+  const course = courses[id];
+
+  if (!course) {
+    return (
+      <div style={styles.container}>
+        <h1>Course Not Found</h1>
+
+        <Link to="/courses" style={styles.button}>
+          Back to Courses
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h1>{course.name}</h1>
+
+        <p>{course.description}</p>
+
+        <p>
+          <strong>Course ID:</strong> {id}
+        </p>
+
+        <Link to="/courses" style={styles.button}>
+          Back to Courses
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// ====================
+// About Page
+// ====================
+
+function About() {
+  return (
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h1>About</h1>
+
+        <p>
+          This Student Course Management Application allows
+          students to view their information and explore
+          available courses.
+        </p>
+
+        <p>
+          This application is built using React, React Router,
+          and the Context API.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ====================
+// App
+// ====================
+
+function App() {
+  return (
+    <BrowserRouter>
+      <StudentProvider>
+        <Navbar />
+
+        <Routes>
+          <Route path="/" element={<Home />} />
+
+          <Route path="/courses" element={<Courses />} />
+
+          <Route
+            path="/course/:id"
+            element={<CourseDetails />}
+          />
+
+          <Route path="/about" element={<About />} />
+        </Routes>
+      </StudentProvider>
+    </BrowserRouter>
+  );
+}
+
+// ====================
+// Styling
+// ====================
+
+const styles = {
+  navbar: {
+    backgroundColor: "#2563eb",
+    color: "white",
+    padding: "20px 40px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  link: {
+    color: "white",
+    textDecoration: "none",
+    marginLeft: "20px",
+    fontWeight: "bold",
+  },
+
+  container: {
+    maxWidth: "900px",
+    margin: "40px auto",
+    padding: "20px",
+    fontFamily: "Arial, sans-serif",
+  },
+
+  courseContainer: {
+    display: "flex",
+    gap: "20px",
+    flexWrap: "wrap",
+  },
+
+  card: {
+    backgroundColor: "#f5f5f5",
+    padding: "25px",
+    borderRadius: "10px",
+    boxShadow: "0 3px 10px rgba(0,0,0,0.15)",
+    marginBottom: "20px",
+    flex: 1,
+  },
+
+  button: {
+    display: "inline-block",
+    marginTop: "10px",
+    padding: "10px 18px",
+    backgroundColor: "#2563eb",
+    color: "white",
+    textDecoration: "none",
+    borderRadius: "5px",
+  },
+};
+
+export default App;
